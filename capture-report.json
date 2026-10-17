@@ -1,0 +1,14 @@
+{
+  "pages": 232,
+  "assets": 1343,
+  "errors": [
+    [
+      "https://westernequipments.com/wp-content/uploads/2025/03/Pastry-Cabinet-Leaflet-LR.pdf",
+      "curl: (28) Operation timed out after 25000 milliseconds with 830767 out of 4327961 bytes received\n"
+    ],
+    [
+      "https://westernequipments.com/wp-content/uploads/2026/05/Deep-Freezer-D525H223-Western-Refrigeration-Pvt-Ltd.pdf.pdf",
+      "curl: (22) The requested URL returned error: 404\n"
+    ]
+  ]
+}
