@@ -60,20 +60,31 @@
   <div class="wrap">
     <a class="logo" href="/" aria-label="{{ site.name }} home">{{ img(logo, [240, 480], alt=site.name, cls='', eager=True, sizes='120px') }}</a>
     <nav class="nav" aria-label="Main">
-      <div class="nav__item">
+      <div class="nav__item nav__item--mega">
         <a class="nav__link" href="/products/" {% if section == 'products' %}aria-current="page"{% endif %}>Products {{ icon('down') }}</a>
         <div class="menu menu--mega">
           {% for col in menu_columns %}
-          <div>
-            {% for m in col %}<a href="{{ m.path }}"><strong>{{ m.label }}</strong>{% if m.range %}<small>{{ m.range }}</small>{% endif %}</a>{% endfor %}
+          <div class="mega__col">
+            <p class="mega__title">{{ col.title }}</p>
+            {% for m in col['items'] %}
+            <a class="mega__link" href="{{ m.path }}">
+              <span class="mega__thumb">{{ img(m.thumb, [96], alt='', sizes='44px') }}</span>
+              <span><strong>{{ m.label }}</strong>{% if m.range %}<small>{{ m.range }}</small>{% endif %}</span>
+            </a>
+            {% endfor %}
           </div>
           {% endfor %}
-          <div class="menu__foot">
+          <div class="mega__feature">
+            {{ img(menu_feature, [400], alt='', sizes='260px') }}
             <div>
-              <strong>{{ product_total }} models</strong>
-              <p>Browse the full catalogue, filter by category and compare specifications side by side.</p>
+              <strong>{{ product_total }} models, one catalogue</strong>
+              <p>Filter by category, compare specs side by side and request a quote.</p>
             </div>
-            <a class="btn btn--light btn--sm" href="/products/">View all products {{ icon('arrow') }}</a>
+            <a class="btn btn--primary btn--sm" href="/products/">View all products {{ icon('arrow') }}</a>
+            <div class="mega__quick">
+              <a href="/compare/">{{ icon('compare') }} Compare</a>
+              <button type="button" data-search-open>{{ icon('search') }} Search</button>
+            </div>
           </div>
         </div>
       </div>
@@ -113,7 +124,7 @@
         <summary>Products {{ icon('down') }}</summary>
         <div>
           <a href="/products/"><strong>All products</strong></a>
-          {% for col in menu_columns %}{% for m in col %}<a href="{{ m.path }}">{{ m.label }}</a>{% endfor %}{% endfor %}
+          {% for col in menu_columns %}{% for m in col['items'] %}<a href="{{ m.path }}">{{ m.label }}</a>{% endfor %}{% endfor %}
         </div>
       </details>
       <details>

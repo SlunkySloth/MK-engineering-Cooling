@@ -227,11 +227,23 @@ class Site:
                            logo_name=lambda s: '' if re.search(r'New-Project|^\d', Path(s).stem) else
                            re.sub(r'^\d+-|-\d+$', '', Path(s).stem).replace('-', ' '))
         hashes = {f.name: hashlib.md5(f.read_bytes()).hexdigest()[:8] for f in (SRC / 'assets').glob('*.*')}
-        menu_columns = [[dict(m, range=fix_typos(m['range'])) for m in col] for col in self.menu]
+        products = self.cat['products']
+
+        def menu_thumb(path):
+            target = self.aliases.get(path, path)
+            members = [p for p in products.values() if target in p['cats']]
+            best = next((p for p in members if p['local']), members[0] if members else None)
+            return (best.get('thumb') or best.get('list_thumb')) if best else None
+
+        groups = ['Display & freezing', 'Kitchen & bar', 'Specialty & retail']
+        menu_columns = [{'title': groups[i] if i < len(groups) else '',
+                         'items': [dict(m, range=fix_typos(m['range']), thumb=menu_thumb(m['path'])) for m in col]}
+                        for i, col in enumerate(self.menu)]
         env.globals.update(
             site=self.config, images=self.img, asset=lambda n: f'/assets/{n}?v={hashes[n]}',
             menu_columns=menu_columns, product_total=len(self.cat['products']),
             footer_categories=[{'label': m['label'], 'path': m['path']} for col in self.menu for m in col][:8],
+            menu_feature=self.home['intro']['img'],
             year=date.today().year, logo=self.config['logo'], favicon=self.config['favicon'],
             touch_icon=self.config['touch_icon'],
             footer_blurb='A Hoshizaki group company manufacturing commercial refrigeration across four plants in India.',
