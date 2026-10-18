@@ -1,3 +1,5 @@
 .capture/
 node_modules/
 *.tar.gz
+build-data.json
+__pycache__/

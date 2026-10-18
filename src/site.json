@@ -1,0 +1,48 @@
+{
+  "name": "Western Refrigeration",
+  "legal_name": "Western Refrigeration Private Limited",
+  "tagline": "Commercial refrigeration, engineered in India",
+  "logo": "/wp-content/uploads/2025/01/western-head-logo-2025.png",
+  "favicon": "/wp-content/uploads/2024/08/cropped-logo-1-32x32.png",
+  "touch_icon": "/wp-content/uploads/2024/08/cropped-logo-1-180x180.png",
+  "email": "sales@westernequipments.com",
+  "phones": [
+    {"label": "Sales enquiry", "display": "+91 022 69881200", "tel": "+9102269881200"},
+    {"label": "Service toll free", "display": "+91 7045017000", "tel": "+917045017000"}
+  ],
+  "address": "501-505, Ascot Centre, Sahar Road, Andheri (East), Mumbai – 400 099",
+  "social": [
+    {"name": "LinkedIn", "url": "https://www.linkedin.com/company/western-refrigeration-pvt-ltd/"},
+    {"name": "Instagram", "url": "https://www.instagram.com/westernrefrigeration/"},
+    {"name": "Facebook", "url": "https://www.facebook.com/westernhoshizaki/"},
+    {"name": "YouTube", "url": "https://www.youtube.com/@WesternRefrigeration"}
+  ],
+  "stats": [
+    {"value": "1972", "label": "Founded in Mumbai"},
+    {"value": "4", "label": "Manufacturing plants in India"},
+    {"value": "1M+", "label": "Units of annual capacity"},
+    {"value": "45+", "label": "Countries served"}
+  ],
+  "company_nav": [
+    {"label": "About us", "path": "/about-us/", "text": "Our story, values and leadership"},
+    {"label": "Factories", "path": "/factories/", "text": "Four plants across Maharashtra and Gujarat"},
+    {"label": "Research & Development", "path": "/research/", "text": "Testing labs and engineering"},
+    {"label": "Sustainability", "path": "/sustainability/", "text": "Solar, SBTi targets, e-waste"},
+    {"label": "Careers", "path": "/careers/", "text": "Culture and opportunities"}
+  ],
+  "industries_nav": [
+    {"label": "Bar & Beverage", "path": "/industries/#beverage"},
+    {"label": "Ice Cream & Dairy", "path": "/industries/#icecreamdairy"},
+    {"label": "Food Service", "path": "/industries/#foodservice"},
+    {"label": "Pharma & Medical", "path": "/industries/#pharmaceutical"},
+    {"label": "Retail & Supermarkets", "path": "/industries/#retail"}
+  ],
+  "footer_links": [
+    {"label": "Blog", "path": "/blog/"},
+    {"label": "Careers", "path": "/careers/"},
+    {"label": "Service network", "path": "/service/"},
+    {"label": "Cashback offers", "path": "/cashback-offers/"},
+    {"label": "No gift policy", "path": "/no-gift-policy/"},
+    {"label": "Supplier code of conduct", "path": "https://westernequipments.com/wp-content/uploads/2024/04/Supplier-Code-of-Conduct_Signed.pdf"}
+  ]
+}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon, img, page_head, cta with context %}
+{% block main %}
+{{ page_head('Blog', [{'name': 'Blog'}], 'Ideas and product stories for kitchens, cafés, retail and hospitality.') }}
+<section class="section">
+  <div class="wrap">
+    {% set lead = posts[0] %}
+    <a class="split post-card" href="{{ lead.url }}" style="margin-bottom:56px">
+      <div class="post-card__img">{{ img(lead.img, [640, 1100], alt='', eager=True, sizes='(max-width: 900px) 100vw, 50vw') }}</div>
+      <div>
+        <div class="meta">{% if lead.category %}<span class="pill">{{ lead.category }}</span>{% endif %}<time datetime="{{ lead.date }}">{{ lead.date|nicedate }}</time></div>
+        <h2 style="margin-top:12px">{{ lead.title }}</h2>
+        <p class="lead">{{ lead.excerpt }}</p>
+        <span class="link-arrow">Read article {{ icon('arrow') }}</span>
+      </div>
+    </a>
+    <div class="post-grid">
+      {% for p in posts[1:] %}
+      <a class="post-card" href="{{ p.url }}">
+        <div class="post-card__img">{{ img(p.img, [480, 800], alt='', sizes='(max-width: 640px) 100vw, 33vw') }}</div>
+        <div class="meta">{% if p.category %}<span class="pill">{{ p.category }}</span>{% endif %}<time datetime="{{ p.date }}">{{ p.date|nicedate }}</time></div>
+        <h3>{{ p.title }}</h3>
+        <p class="muted" style="margin:0;font-size:.95rem">{{ p.excerpt|truncate(140) }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{{ cta() }}
+{% endblock %}

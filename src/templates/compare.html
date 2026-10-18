@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon, page_head with context %}
+{% block main %}
+{{ page_head('Compare products', [{'name': 'Products', 'path': '/products/'}, {'name': 'Compare'}], 'Specifications side by side for up to four models. Your selection is saved in this browser.') }}
+<section class="section">
+  <div class="wrap">
+    <div id="compare-root" hidden></div>
+    <div id="compare-empty" class="empty">
+      <p>You haven't picked any products yet. Tick <strong>Compare</strong> on any product card, or use <strong>Add to compare</strong> on a product page.</p>
+      <a class="btn btn--primary" href="/products/">Browse products {{ icon('arrow') }}</a>
+    </div>
+    <noscript><p class="empty">Comparing products needs JavaScript.</p></noscript>
+  </div>
+</section>
+{% endblock %}

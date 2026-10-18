@@ -1,7 +1,7 @@
 """Apply replica-only presentation fixes after capture."""
 from pathlib import Path
 import re
-root=Path(__file__).parent/'dist'
+root=Path(__file__).parent/'source'
 count=0
 fonts={}
 fontdir=root/'external/fonts.googleapis.com'

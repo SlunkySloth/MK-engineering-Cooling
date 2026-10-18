@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon, page_head with context %}
+{% block main %}
+{{ page_head('Contact us', [{'name': 'Contact us'}], 'Questions about a model, a bulk order or an existing installation? Reach the right team directly.') }}
+<section class="section">
+  <div class="wrap contact-grid">
+    <div class="info-list">
+      <div class="info">{{ icon('phone') }}<div><h3>Call us</h3>{% for p in site.phones %}<p><a href="tel:{{ p.tel }}">{{ p.display }}</a> · {{ p.label }}</p>{% endfor %}</div></div>
+      <div class="info">{{ icon('mail') }}<div><h3>Email</h3><p><a href="mailto:{{ site.email }}">{{ site.email }}</a></p></div></div>
+      {% for o in contact.offices %}
+      <div class="info">{{ icon('pin') }}<div><h3>{{ o.title }}</h3><p>{{ o.html|safe }}</p></div></div>
+      {% endfor %}
+      <div class="info">{{ icon('pin') }}<div><h3>Factories</h3><p>Shahpur (Maharashtra), Silvassa, Sanjan and Tadgam (Gujarat). <a href="/factories/">Visit our plants →</a></p></div></div>
+    </div>
+    <div class="form-card">
+      <span class="eyebrow">Send an enquiry</span>
+      <h2 style="font-size:1.6rem">Tell us your requirement</h2>
+      <form class="form" data-mailto data-subject="Website enquiry">
+        <label>Full name<input class="input" name="name" data-label="Name" required autocomplete="name"></label>
+        <label>Mobile<input class="input" name="phone" data-label="Mobile" type="tel" required autocomplete="tel"></label>
+        <label>Email<input class="input" name="email" data-label="Email" type="email" required autocomplete="email"></label>
+        <label>Area / City<input class="input" name="city" data-label="City" autocomplete="address-level2"></label>
+        <label class="full">Department
+          <select class="select" name="department" data-label="Department" style="width:100%">
+            {% for d in contact.departments %}<option>{{ d }}</option>{% endfor %}
+          </select>
+        </label>
+        <fieldset class="full">
+          <legend>Products you're interested in</legend>
+          <div class="checks">{% for c in contact.interests %}<label><input type="checkbox" name="interest" data-label="Interested in" value="{{ c }}"> {{ c }}</label>{% endfor %}</div>
+        </fieldset>
+        <label class="full">Message<textarea class="input" name="message" data-label="Message"></textarea></label>
+        <div class="full btn-row" style="justify-content:space-between;align-items:center">
+          <p class="form-note">Opens your email app with these details filled in.</p>
+          <button class="btn btn--primary" type="submit">Send enquiry {{ icon('arrow') }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% if contact.maps %}
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <iframe class="map" src="{{ contact.maps[0] }}" title="Map of head office" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

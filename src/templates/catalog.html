@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon, img, page_head, product_card, cta with context %}
+{% macro tree_nodes(nodes) %}
+<ul>{% for n in nodes %}<li><a href="{{ n.path }}"{% if n.path == current %} aria-current="page"{% endif %}>{{ n.name }} <span>{{ n.count }}</span></a>{% if n.children and (n.path in open_paths) %}{{ tree_nodes(n.children) }}{% endif %}</li>{% endfor %}</ul>
+{% endmacro %}
+{% block main %}
+{% call page_head(title, trail, lead) %}
+  {% if chips %}
+  <nav class="chips" aria-label="{{ chips_label }}">
+    {% for c in chips %}
+      {% if c.filter is defined %}<button class="chip" type="button" data-filter-cat="{{ c.filter }}" aria-pressed="false">{{ c.name }} <small>{{ c.count }}</small></button>
+      {% else %}<a class="chip" href="{{ c.path }}"{% if c.path == current %} aria-current="page"{% endif %}>{{ c.name }} <small>{{ c.count }}</small></a>{% endif %}
+    {% endfor %}
+  </nav>
+  {% endif %}
+{% endcall %}
+
+{% if show_tiles %}
+<section class="section" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="section-head"><div><span class="eyebrow">Shop by category</span><h2>Product range</h2></div></div>
+    <div class="tiles">
+      {% for c in range_cards %}
+      <a class="tile" href="{{ c.path }}">
+        {{ img(c.img, [360, 640], alt=c.name, sizes='(max-width: 640px) 50vw, (max-width: 1100px) 33vw, 290px') }}
+        <span class="tile__body"><strong>{{ c.name }}</strong>{% if c.range %}<small>{{ c.range }}</small>{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section" data-catalog {% if show_tiles %}id="all"{% endif %}>
+  <div class="wrap">
+    {% if show_tiles %}<div class="section-head"><div><span class="eyebrow">Full catalogue</span><h2>All products</h2></div></div>{% endif %}
+    <div class="catalog">
+      <aside class="sidebar" aria-label="Product categories">
+        <h2>Categories</h2>
+        <nav class="tree">
+          <ul><li><a href="/products/"{% if current == '/products/' %} aria-current="page"{% endif %}>All products <span>{{ product_total }}</span></a></li></ul>
+          {{ tree_nodes(tree) }}
+        </nav>
+      </aside>
+      <div>
+        <div class="toolbar">
+          <button class="btn btn--ghost btn--sm filters-toggle" type="button" data-filters-toggle aria-expanded="false">{{ icon('filter') }} Categories</button>
+          <label class="field"><span class="sr-only">Filter by model or specification</span>{{ icon('search') }}<input class="input" type="search" data-filter-q placeholder="Filter by model, e.g. 300 or R-290"></label>
+          <label><span class="sr-only">Sort</span><select class="select" data-filter-sort><option value="">Featured</option><option value="az">Model A–Z</option><option value="za">Model Z–A</option></select></label>
+          <span class="count" aria-live="polite">{{ items|length }} products</span>
+        </div>
+        <div class="products">
+          {% for p in items %}{{ product_card(p) }}{% endfor %}
+        </div>
+        <p class="empty" hidden>No products match your filters. <button class="btn btn--ghost btn--sm" type="button" onclick="location.href=location.pathname">Reset filters</button></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if faq %}
+<section class="section section--soft">
+  <div class="wrap">
+    <div class="section-head" style="justify-content:center;text-align:center"><div><span class="eyebrow">Good to know</span><h2>Frequently asked questions</h2></div></div>
+    <div class="faq">
+      {% for f in faq %}<details><summary>{{ f.q }} {{ icon('plus') }}</summary><div>{{ f.a|links|safe }}</div></details>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{{ cta() }}
+{% endblock %}

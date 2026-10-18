@@ -1,0 +1,113 @@
+{% macro icon(name) %}<svg class="icon" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{% endmacro %}
+
+{% macro img(src, widths=[480, 960], alt='', cls='', eager=False, sizes='100vw', attrs='') %}{% set im = images(src, widths) %}{% if im %}<img src="{{ im.src }}"{% if ',' in im.srcset %} srcset="{{ im.srcset }}" sizes="{{ sizes }}"{% endif %} width="{{ im.width }}" height="{{ im.height }}" alt="{{ alt }}"{% if cls %} class="{{ cls }}"{% endif %}{% if eager %} fetchpriority="high"{% else %} loading="lazy" decoding="async"{% endif %} {{ attrs|safe }}>{% endif %}{% endmacro %}
+
+{% macro crumbs(items) %}
+<ol class="crumbs" aria-label="Breadcrumb">
+  <li><a href="/">Home</a></li>
+  {% for c in items %}<li>{% if c.path and not loop.last %}<a href="{{ c.path }}">{{ c.name }}</a>{% else %}<span aria-current="page">{{ c.name }}</span>{% endif %}</li>{% endfor %}
+</ol>
+{% endmacro %}
+
+{% macro page_head(title, trail=[], lead='', eyebrow='') %}
+<section class="page-head">
+  <div class="wrap">
+    {{ crumbs(trail or [{'name': title}]) }}
+    {% if eyebrow %}<span class="eyebrow">{{ eyebrow }}</span>{% endif %}
+    <h1>{{ title }}</h1>
+    {% if lead %}<p class="lead">{{ lead|links|safe }}</p>{% endif %}
+    {{ caller() if caller }}
+  </div>
+</section>
+{% endmacro %}
+
+{% macro product_card(p, sizes='(max-width: 640px) 50vw, 260px') %}
+<article class="product-card" data-name="{{ p.name }}" data-cats="{{ p.cat_slugs|join(' ') }}" data-search="{{ p.search }}">
+  <div class="product-card__img">{{ img(p.thumb, [320, 560], alt=p.name, sizes=sizes) }}</div>
+  <div class="product-card__body">
+    <span class="product-card__cat">{{ p.cat }}</span>
+    <h3><a href="{{ p.href }}"{% if not p.local %} target="_blank" rel="noopener"{% endif %}>{{ p.name }}</a></h3>
+    {% if p.key_specs %}<dl>{% for s in p.key_specs %}<div><dt>{{ s.label|striptags }}</dt><dd title="{{ s.value }}">{{ s.value }}</dd></div>{% endfor %}</dl>{% endif %}
+    <div class="product-card__foot">
+      {% if p.local %}<label class="compare-toggle"><input type="checkbox" data-compare="{{ p.url }}"> Compare</label>
+      {% else %}<span class="ext-badge">{{ icon('external') }} Details on original site</span>{% endif %}
+    </div>
+  </div>
+</article>
+{% endmacro %}
+
+{% macro buttons(list, light=False) %}
+{% if list %}<div class="btn-row">{% for b in list %}{% set ext = b.href|is_external %}<a class="btn {{ 'btn--outline-light' if light else ('btn--primary' if loop.first else 'btn--ghost') }}" href="{{ b.href|link }}"{% if ext %} target="_blank" rel="noopener"{% endif %}>{% if b.href.endswith('.pdf') %}{{ icon('file') }}{% elif 'youtube' in b.href %}{{ icon('play') }}{% endif %}{{ b.text }}{% if not ext %} {{ icon('arrow') }}{% endif %}</a>{% endfor %}</div>{% endif %}
+{% endmacro %}
+
+{% macro text_blocks(blocks) %}
+{% for b in blocks %}
+  {% if b.type == 'p' %}<p>{{ b.html|links|safe }}</p>
+  {% elif b.type == 'list' %}<ul class="checklist">{% for li in b['items'] %}<li><span>{{ li|links|safe }}</span></li>{% endfor %}</ul>
+  {% elif b.type == 'h' %}<h3>{{ b.text }}</h3>
+  {% endif %}
+{% endfor %}
+{% endmacro %}
+
+{# A generic content section: picks a layout from what the section contains. #}
+{% macro section(s, i) %}
+<section class="section content-section{% if s.soft %} section--soft content-section--soft{% endif %}"{% if s.anchor %} id="{{ s.anchor }}"{% endif %}>
+  <div class="wrap">
+  {% if s.layout == 'split' %}
+    <div class="split{% if i is odd %} split--flip{% endif %}">
+      <div>
+        {% if s.eyebrow %}<span class="eyebrow">{{ s.eyebrow }}</span>{% endif %}
+        {% if s.title %}<h2>{{ s.title }}</h2>{% endif %}
+        {{ text_blocks(s.text) }}
+        {{ buttons(s.buttons) }}
+      </div>
+      <div class="split__media{% if s.images|length == 2 %} split__media--pair{% endif %}">
+        {% for im in s.images[:2] %}{{ img(im.src, [640, 1100], alt=im.alt or s.title, sizes='(max-width: 900px) 100vw, 50vw') }}{% endfor %}
+      </div>
+    </div>
+  {% else %}
+    {% if s.title or s.eyebrow %}
+    <div class="section-head"><div>
+      {% if s.eyebrow %}<span class="eyebrow">{{ s.eyebrow }}</span>{% endif %}
+      {% if s.title %}<h2>{{ s.title }}</h2>{% endif %}
+    </div></div>
+    {% endif %}
+    {% if s.text %}<div class="prose">{{ text_blocks(s.text) }}</div>{% endif %}
+    {{ buttons(s.buttons) }}
+    {% if s.cards %}
+    <div class="card-grid{% if s.numbered %} num-grid{% endif %}" style="margin-top:28px">
+      {% for c in s.cards %}
+      <div class="card{% if s.numbered %} num{% endif %}">
+        {% if c.img %}<div class="card__img{% if c.cover %} card__img--cover{% endif %}">{{ img(c.img.src, [400, 800], alt=c.title, sizes='(max-width: 640px) 100vw, 300px') }}</div>{% endif %}
+        {% if c.eyebrow %}<span class="eyebrow">{{ c.eyebrow }}</span>{% endif %}
+        <h3>{{ c.title }}</h3>
+        {% for h in c.html %}<p>{{ h|links|safe }}</p>{% endfor %}
+        {% for b in c.buttons %}<a class="link-arrow" href="{{ b.href|link }}">{{ b.text }} {{ icon('arrow') }}</a>{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if s.images %}
+    <div class="gallery-grid" style="margin-top:28px">{% for im in s.images %}{{ img(im.src, [640, 1200], alt=im.alt or s.title, sizes='(max-width: 900px) 100vw, 50vw') }}{% endfor %}</div>
+    {% endif %}
+  {% endif %}
+  </div>
+</section>
+{% endmacro %}
+
+{% macro cta(title='Not sure which model fits?', text='Tell us what you need to store, display or serve. Our sales team will recommend the right equipment and share a quote.') %}
+<section class="section">
+  <div class="wrap">
+    <div class="cta">
+      <div>
+        <h2>{{ title }}</h2>
+        <p>{{ text }}</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn--light" type="button" data-enquire="">Request a quote</button>
+        <a class="btn btn--outline-light" href="tel:{{ site.phones[0].tel }}">{{ icon('phone') }} {{ site.phones[0].display }}</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endmacro %}

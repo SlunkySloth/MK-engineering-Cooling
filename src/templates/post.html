@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon, img, crumbs, cta with context %}
+{% block main %}
+<article>
+  <header class="page-head">
+    <div class="wrap" style="max-width:900px">
+      {{ crumbs([{'name': 'Blog', 'path': '/blog/'}, {'name': post.title}]) }}
+      <div class="meta">{% if post.category %}<span class="pill">{{ post.category }}</span>{% endif %}<time datetime="{{ post.date }}">{{ post.date|nicedate }}</time><span>· {{ post.minutes }} min read</span></div>
+      <h1 style="margin-top:14px;font-size:clamp(1.9rem,1.3rem + 2.4vw,3rem)">{{ post.title }}</h1>
+    </div>
+  </header>
+  <div class="wrap" style="max-width:900px">
+    {% if post.img %}<div style="margin-top:32px">{{ img(post.img, [800, 1400], alt='', eager=True, sizes='(max-width: 900px) 100vw, 860px', attrs='style="border-radius:24px;width:100%"') }}</div>{% endif %}
+    <div class="prose prose--center section" style="padding-top:40px">
+      {% for b in post.body %}
+        {% if b.type == 'p' %}<p>{{ b.html|links|safe }}</p>
+        {% elif b.type in ('h2', 'h3', 'h4', 'h5') %}<{{ 'h2' if b.type == 'h2' else 'h3' }}>{{ b.html|links|safe }}</{{ 'h2' if b.type == 'h2' else 'h3' }}>
+        {% elif b.type in ('ul', 'ol') %}<{{ b.type }}>{% for li in b['items'] %}<li>{{ li|links|safe }}</li>{% endfor %}</{{ b.type }}>
+        {% elif b.type == 'img' %}{{ img(b.src, [800, 1400], alt=b.alt, sizes='(max-width: 900px) 100vw, 760px') }}
+        {% elif b.type == 'table' %}<table>{% for r in b.rows %}<tr>{% for c in r %}<td>{{ c|links|safe }}</td>{% endfor %}</tr>{% endfor %}</table>
+        {% elif b.type == 'blockquote' %}<blockquote>{{ b.html|links|safe }}</blockquote>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</article>
+{% if others %}
+<section class="section section--soft">
+  <div class="wrap">
+    <div class="section-head"><div><span class="eyebrow">Keep reading</span><h2>More articles</h2></div><a class="btn btn--ghost" href="/blog/">All articles {{ icon('arrow') }}</a></div>
+    <div class="post-grid">
+      {% for p in others %}
+      <a class="post-card" href="{{ p.url }}">
+        <div class="post-card__img">{{ img(p.img, [480, 800], alt='', sizes='(max-width: 640px) 100vw, 33vw') }}</div>
+        <div class="meta">{% if p.category %}<span class="pill">{{ p.category }}</span>{% endif %}<time datetime="{{ p.date }}">{{ p.date|nicedate }}</time></div>
+        <h3>{{ p.title }}</h3>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{{ cta() }}
+{% endblock %}
