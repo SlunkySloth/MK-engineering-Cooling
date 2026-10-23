@@ -12,9 +12,6 @@
         <a class="btn btn--primary" href="/products/">Explore {{ product_total }} products {{ icon('arrow') }}</a>
         <button class="btn btn--ghost" type="button" data-enquire="">Talk to sales</button>
       </div>
-      <div class="stats">
-        {% for s in site.stats %}<div class="stat"><strong>{{ s.value }}</strong><span>{{ s.label }}</span></div>{% endfor %}
-      </div>
     </div>
     <div class="hero__media">{{ img(home.intro.img, [640, 1080], alt='Visi cooler, pastry cabinet, deep freezer and ice machine', eager=True, sizes='(max-width: 900px) 100vw, 45vw') }}</div>
   </div>
@@ -79,59 +76,24 @@
   </div>
 </section>
 
-<section class="section">
-  <div class="wrap duo">
-    <a class="feature-card" href="/research/">
-      {{ img(home.rnd.img, [640, 1000], alt='', sizes='(max-width: 640px) 100vw, 50vw') }}
-      <div class="feature-card__body"><span class="eyebrow">Research &amp; Development</span><h2>Engineered and tested in-house</h2><p>{{ home.rnd.html|striptags }}</p><span class="btn btn--light btn--sm">Inside our R&amp;D {{ icon('arrow') }}</span></div>
-    </a>
-    <a class="feature-card" href="/factories/">
-      {{ img(home.facilities.img, [640, 1000], alt='', sizes='(max-width: 640px) 100vw, 50vw') }}
-      <div class="feature-card__body"><span class="eyebrow">State-of-the-art facilities</span><h2>Four plants, one million units a year</h2><p>{{ home.facilities.html|striptags }}</p><span class="btn btn--light btn--sm">See our factories {{ icon('arrow') }}</span></div>
-    </a>
-  </div>
-</section>
-
 <section class="section section--soft" style="overflow:hidden">
   <div class="wrap">
     <div class="section-head" style="justify-content:center;text-align:center"><div><span class="eyebrow">We are</span><h2>Trusted by the best</h2></div></div>
   </div>
-  {% for row in logo_rows %}
-  <div class="marquee{% if loop.index is even %} marquee--reverse{% endif %}">
+  <div class="marquee">
     <div class="marquee__track">
-      {% for pass in [0, 1] %}{% for l in row %}<div class="marquee__item"{% if pass %} aria-hidden="true"{% endif %}>{{ img(l, [200], alt='' if pass else l|logo_name, sizes='150px') }}</div>{% endfor %}{% endfor %}
+      {% for pass in range(6) %}{% for c in site.clients %}<div class="marquee__item"{% if pass %} aria-hidden="true"{% endif %}>{% if c.img %}{{ img(c.img, [200, 400], alt='' if pass else c.name, sizes='160px') }}{% else %}<span class="marquee__name">{{ c.name }}</span>{% endif %}</div>{% endfor %}{% endfor %}
     </div>
-  </div>
-  {% endfor %}
-</section>
-
-<section class="section section--dark">
-  <div class="wrap global">
-    <div>
-      <span class="eyebrow">Global brilliance, local excellence</span>
-      <div class="big-number">45<span>+</span></div>
-      <h2 style="margin-top:.4em">Nations served</h2>
-      <p class="lead">{{ home.global.html|links|safe }}</p>
-    </div>
-    {{ img(home.global.img, [800, 1400], alt='World map of markets served', sizes='(max-width: 900px) 100vw, 60vw') }}
   </div>
 </section>
 
-<section class="section">
+<section class="section" style="overflow:hidden">
   <div class="wrap">
-    <div class="section-head">
-      <div><span class="eyebrow">Responsibility</span><h2>Sustainability</h2></div>
-      <a class="btn btn--ghost" href="/sustainability/">Our commitments {{ icon('arrow') }}</a>
-    </div>
-    <div class="card-grid card-grid--3">
-      {% for s in home.sustainability %}
-      <a class="card" href="{{ s.href|link }}">
-        <span class="card__icon">{{ img(s.icon, [96], alt='', sizes='30px') }}</span>
-        <h3>{{ s.title }}</h3>
-        <p>{{ s.text }}</p>
-        <span class="link-arrow">Learn more {{ icon('arrow') }}</span>
-      </a>
-      {% endfor %}
+    <div class="section-head" style="justify-content:center;text-align:center"><div><span class="eyebrow">Our brands</span><h2>Brands we deal with</h2></div></div>
+  </div>
+  <div class="marquee marquee--reverse">
+    <div class="marquee__track">
+      {% for pass in range(2) %}{% for c in site.brands %}<div class="marquee__item"{% if pass %} aria-hidden="true"{% endif %}>{% if c.img %}{{ img(c.img, [200, 400], alt='' if pass else c.name, sizes='160px') }}{% else %}<span class="marquee__name">{{ c.name }}</span>{% endif %}</div>{% endfor %}{% endfor %}
     </div>
   </div>
 </section>

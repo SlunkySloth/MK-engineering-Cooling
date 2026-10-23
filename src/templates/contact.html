@@ -5,8 +5,8 @@
 <section class="section">
   <div class="wrap contact-grid">
     <div class="info-list">
-      <div class="info">{{ icon('phone') }}<div><h3>Call us</h3>{% for p in site.phones %}<p><a href="tel:{{ p.tel }}">{{ p.display }}</a> · {{ p.label }}</p>{% endfor %}</div></div>
-      <div class="info">{{ icon('mail') }}<div><h3>Email</h3><p><a href="mailto:{{ site.email }}">{{ site.email }}</a></p></div></div>
+      <div class="info">{{ icon('phone') }}<div><h3>Call us</h3>{% for p in site.phones %}<p><a href="tel:{{ p.tel }}">{{ p.display }}</a>{% if p.label %} · {{ p.label }}{% endif %}</p>{% endfor %}</div></div>
+      <div class="info">{{ icon('mail') }}<div><h3>Email</h3>{% for e in site.emails %}<p><a href="mailto:{{ e }}">{{ e }}</a></p>{% endfor %}</div></div>
       {% for o in contact.offices %}
       <div class="info">{{ icon('pin') }}<div><h3>{{ o.title }}</h3><p>{{ o.html|safe }}</p></div></div>
       {% endfor %}

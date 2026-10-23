@@ -17,6 +17,8 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup
 
 import extract as X
+import elanpro
+import symphony
 from images import Images
 
 ROOT = X.ROOT
@@ -113,8 +115,12 @@ class Site:
         self.menu = X.menu_products()
         self.content = {p: X.content_page(p) for p in PAGE_TITLES}
         self.aliases = self.cat['aliases']
+        # Dealer brands shown alongside the Western catalogue, in menu order.
+        self.brands = [dict(mod.catalogue(), mod=mod) for mod in (symphony, elanpro)]
+        self.brands = [b for b in self.brands if b['products']]
         print(f'extracted in {time.time() - t:.1f}s: {len(self.cat["products"])} products, '
-              f'{len(self.cat["categories"])} categories, {len(self.posts)} posts')
+              f'{len(self.cat["categories"])} categories, {len(self.posts)} posts, '
+              + ', '.join(f"{len(b['products'])} {b['mod'].NAME}" for b in self.brands) + ' products')
 
         cats = self.cat['categories']
         products = self.cat['products']
@@ -131,9 +137,19 @@ class Site:
         # Every URL we will write, so links can be resolved before rendering.
         self.generated = {'/', '/products/', '/contact-us/', '/blog/', '/compare/', *PAGE_TITLES, *cats,
                           *self.cat['tags'], *(p for p, v in products.items() if v['local']),
-                          *(post['url'] for post in self.posts), *self.aliases}
+                          *(post['url'] for post in self.posts), *self.aliases,
+                          *(p for b in self.brands for p in (b['mod'].ROOT_PATH, *b['categories'], *b['products']))}
 
     def card(self, p):
+        if p.get('brand'):
+            return {
+                'name': p['name'], 'url': p['url'], 'href': p['url'], 'local': True, 'thumb': p['thumb'],
+                'cat': p.get('sub') or p['primary_cat_name'], 'cat_slugs': p['cat_slugs'], 'brand': p['brand'],
+                'key_specs': [{'label': s['label'], 'value': short(s['value'])} for s in p['key_specs']],
+                'search': re.sub(r'\s+', ' ', html.unescape(' '.join(
+                    [p['brand'], p['name'], p.get('model', ''), p['primary_cat_name'], p.get('sub', ''),
+                     *(s['label'] + ' ' + s['value'] for s in p['specs'])]))).lower(),
+            }
         specs = p['specs']
         key = []
         for word in SPEC_PRIORITY:
@@ -239,14 +255,26 @@ class Site:
         menu_columns = [{'title': groups[i] if i < len(groups) else '',
                          'items': [dict(m, range=fix_typos(m['range']), thumb=menu_thumb(m['path'])) for m in col]}
                         for i, col in enumerate(self.menu)]
+        brand_logo = {b['name']: b['img'] for b in self.config.get('brands', [])}
+        brand_menu = [
+            {'name': 'Western Equipments', 'logo': brand_logo.get('Western'), 'href': '/products/',
+             'count': len(products), 'text': 'Commercial refrigeration', 'columns': menu_columns},
+        ]
+        for b in self.brands:
+            mod, bcats = b['mod'], b['categories']
+            brand_menu.append(
+                {'name': mod.NAME, 'logo': brand_logo.get(mod.NAME), 'href': mod.ROOT_PATH,
+                 'count': len(b['products']), 'text': mod.MENU_TEXT,
+                 'columns': [{'title': title, 'items': [{'label': bcats[p]['name'], 'path': p, 'thumb': bcats[p]['thumb'],
+                                                         'range': f"{bcats[p]['count']} models"} for p in paths]}
+                             for title, paths in b['groups'] if paths]})
         env.globals.update(
             site=self.config, images=self.img, asset=lambda n: f'/assets/{n}?v={hashes[n]}',
-            menu_columns=menu_columns, product_total=len(self.cat['products']),
+            menu_columns=menu_columns, brand_menu=brand_menu, product_total=len(self.cat['products']),
             footer_categories=[{'label': m['label'], 'path': m['path']} for col in self.menu for m in col][:8],
             menu_feature=self.home['intro']['img'],
             year=date.today().year, logo=self.config['logo'], favicon=self.config['favicon'],
             touch_icon=self.config['touch_icon'],
-            footer_blurb='A Hoshizaki group company manufacturing commercial refrigeration across four plants in India.',
         )
         return env
 
@@ -258,6 +286,52 @@ class Site:
         html_text = re.sub(r'\n\s*\n+', '\n', html_text)
         f.write_text(html_text, encoding='utf-8')
         self.pages[path] = f
+
+    def render_brand(self, env, b, common):
+        mod, bproducts, bcats = b['mod'], b['products'], b['categories']
+        name, root = mod.NAME, mod.ROOT_PATH
+        cards = {u: self.card(p) for u, p in bproducts.items()}
+        tree = [dict(c, children=[]) for c in bcats.values()]
+        tree_root = {'name': f'All {name}', 'path': root, 'count': len(bproducts)}
+        trail = [{'name': name, 'path': root}]
+        range_chips = [{'name': f'All {name}', 'path': root, 'count': len(bproducts)}] + \
+                      [{'name': o['name'], 'path': o['path'], 'count': o['count']} for o in bcats.values()]
+        self.write(root, env.get_template('catalog.html').render(
+            title=mod.TITLE, trail=[{'name': name}],
+            lead=f"{len(bproducts)} {name} models across {len(bcats)} ranges. Ask us for pricing, delivery and installation.",
+            chips=[{'name': 'All', 'filter': '', 'count': len(bproducts)}] +
+                  [{'name': c['name'], 'filter': c['slug'], 'count': c['count']} for c in bcats.values()],
+            chips_label='Filter by range', current=root, open_paths=set(), tree=tree, tree_root=tree_root,
+            items=list(cards.values()), show_tiles=True, section='products',
+            tiles=[{'path': c['path'], 'img': c['thumb'], 'name': c['name'], 'range': f"{c['count']} models"} for c in bcats.values()],
+            tiles_title=f'{name} ranges',
+            meta_title=f"{mod.TITLE} | {self.config['name']}",
+            meta_description=f"{mod.META}: {len(bproducts)} models.", **common))
+        for path, c in bcats.items():
+            subs = c.get('subs') or []
+            chips = ([{'name': 'All', 'filter': '', 'count': c['count']}] +
+                     [{'name': s['name'], 'filter': s['slug'], 'count': s['count']} for s in subs]) if len(subs) > 1 else range_chips
+            blurb = c.get('blurb')
+            self.write(path, env.get_template('catalog.html').render(
+                title=f"{name} {c['name']}", trail=trail + [{'name': c['name']}],
+                lead=f"{c['count']} model{'s' if c['count'] != 1 else ''}" + (f' · {blurb}' if blurb else '') + '.',
+                chips=chips, chips_label='Sub-categories' if len(subs) > 1 else 'Ranges',
+                current=path, open_paths=set(), tree=tree, tree_root=tree_root,
+                items=[cards[u] for u, p in bproducts.items() if p['primary_cat'] == path], section='products',
+                meta_title=f"{name} {c['name']} | {self.config['name']}",
+                meta_description=f"{name} {c['name'].lower()}: {c['count']} models" + (f", including {blurb}" if blurb else '') + '.',
+                **common))
+        for u, p in bproducts.items():
+            same = [o for o, q in bproducts.items() if o != u and q['primary_cat'] == p['primary_cat']]
+            rel = [o for o in same if p.get('sub') and bproducts[o].get('sub') == p['sub']]
+            rel += [o for o in same if o not in rel]
+            p['highlights'] = (p['key_specs'] + [s for s in p['specs'] if s not in p['key_specs']])[:3]
+            self.write(u, env.get_template('product.html').render(
+                p=p, related=[cards[r] for r in rel[:4]],
+                trail=trail + [{'name': p['primary_cat_name'], 'path': p['primary_cat']}, {'name': p['name']}],
+                section='products', meta_title=f"{name} {p['name']} – {p.get('sub') or p['primary_cat_name']} | {self.config['name']}",
+                meta_description=f"{name} {p['name']} {(p.get('sub') or p['primary_cat_name']).lower()}. " +
+                                 ', '.join(f"{html.unescape(s['label'])} {html.unescape(s['value'])}" for s in p['specs'][:3]) + '.'))
 
     def build(self):
         t0 = time.time()
@@ -294,17 +368,18 @@ class Site:
         common = dict(range_cards=range_cards)
 
         # Home
-        logos = self.home['logos']
-        half = (len(logos) + 1) // 2
         industries_links = {'Hotels': '/industries/#foodservice', 'Cafe': '/industries/#foodservice',
                             'Retail': '/industries/#retail', 'Bar': '/industries/#beverage'}
         for ind in self.home['industries']:
             ind['href'] = next((v for k, v in industries_links.items() if ind['title'].startswith(k)), '/industries/')
+        removed_banners = {'/wp-content/uploads/2026/07/Vending-Machine-Western-Refrigeration.png',
+                           '/wp-content/uploads/2025/07/Western-Refrigeration.webp'}
+        self.home['banners'] = [b for b in self.home['banners'] if b['img'] not in removed_banners]
         for b in self.home['banners']:
             target = products.get(b['href'] or '')
             b['alt'] = f"{target['name']} – {target['primary_cat_name']}" if target else 'Featured product range'
         self.write('/', env.get_template('home.html').render(
-            home=self.home, posts=self.posts, logo_rows=[logos[:half], logos[half:]],
+            home=self.home, posts=self.posts,
             meta_title=self.home['meta_title'], meta_description=self.home['meta_description'], **common))
 
         # Catalogue: all products
@@ -338,7 +413,7 @@ class Site:
             lead = f"{n['count']} model{'s' if n['count'] != 1 else ''}" + (f' · {rng}' if rng else '')
             self.write(path, env.get_template('catalog.html').render(
                 title=n['name'], trail=crumbs_for(n['path']), lead=lead, chips=chips, chips_label='Sub-categories',
-                current=n['path'], open_paths=open_paths, tree=top, items=members, faq=n.get('faq'),
+                current=n['path'], open_paths=open_paths, tree=top, items=members,
                 section='products', meta_title=n.get('meta_title') or f"{n['name']} | {self.config['name']}",
                 meta_description=n.get('meta_description') or f"{n['name']} range from {self.config['name']}: {lead}.",
                 **common))
@@ -365,6 +440,10 @@ class Site:
                 p=p, related=[cards[r] for r in rel[:4]], trail=crumbs_for(p['primary_cat']) + [{'name': p['name']}],
                 section='products', meta_title=f"{p['name']} – {p['primary_cat_name']} | {self.config['name']}",
                 meta_description=f"{p['name']} {p['primary_cat_name'].lower()} by {self.config['name']}. {spec_desc}."))
+
+        # Dealer brands: brand catalogue, range pages and product pages
+        for b in self.brands:
+            self.render_brand(env, b, common)
 
         # Content pages
         for path, (title, section) in PAGE_TITLES.items():
@@ -395,8 +474,17 @@ class Site:
             th = self.img(c['thumb'], [160])
             index.append({'t': c['name'], 'u': c['href'], 'k': 'Product', 'c': c['cat'], 'i': th['src'] if th else '',
                           's': ' '.join(re.sub('<[^>]+>', '', s['value']) for s in p['specs'])})
+        for b in self.brands:
+            for u, p in b['products'].items():
+                th = self.img(p['thumb'], [160])
+                index.append({'t': f"{p['brand']} {p['name']}", 'u': u, 'k': 'Product', 'c': p.get('sub') or p['primary_cat_name'],
+                              'i': th['src'] if th else '', 's': ' '.join(html.unescape(s['value']) for s in p['specs'])})
         for n in cats.values():
             index.append({'t': n['name'], 'u': n['path'], 'k': 'Category', 'c': cats[n['parent']]['name'] if n['parent'] else ''})
+        for b in self.brands:
+            index.append({'t': b['mod'].TITLE, 'u': b['mod'].ROOT_PATH, 'k': 'Category', 'c': b['mod'].NAME})
+            for c in b['categories'].values():
+                index.append({'t': f"{b['mod'].NAME} {c['name']}", 'u': c['path'], 'k': 'Category', 'c': b['mod'].NAME})
         for path, (title, _) in PAGE_TITLES.items():
             index.append({'t': title, 'u': path, 'k': 'Page'})
         index += [{'t': 'Contact us', 'u': '/contact-us/', 'k': 'Page'}, {'t': 'Blog', 'u': '/blog/', 'k': 'Page'}]
@@ -410,6 +498,11 @@ class Site:
                 th = self.img(p['thumb'], [320])
                 compare[u] = {'name': p['name'], 'url': u, 'cat': p['primary_cat_name'], 'img': th['src'] if th else '',
                               'specs': [[s['label'], s['value']] for s in p['specs']]}
+        for b in self.brands:
+            for u, p in b['products'].items():
+                th = self.img(p['thumb'], [320])
+                compare[u] = {'name': f"{p['brand']} {p['name']}", 'url': u, 'cat': p.get('sub') or p['primary_cat_name'],
+                              'img': th['src'] if th else '', 'specs': [[s['label'], s['value']] for s in p['specs']]}
         (DIST / 'products.json').write_text(json.dumps(compare, ensure_ascii=False, separators=(',', ':')))
 
         # Static assets

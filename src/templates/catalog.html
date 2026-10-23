@@ -18,9 +18,9 @@
 {% if show_tiles %}
 <section class="section" style="padding-bottom:0">
   <div class="wrap">
-    <div class="section-head"><div><span class="eyebrow">Shop by category</span><h2>Product range</h2></div></div>
-    <div class="tiles">
-      {% for c in range_cards %}
+    <div class="section-head"><div><span class="eyebrow">Shop by category</span><h2>{{ tiles_title or 'Product range' }}</h2></div></div>
+    <div class="tiles{% if tiles and tiles|length == 5 %} tiles--5{% endif %}">
+      {% for c in (tiles or range_cards) %}
       <a class="tile" href="{{ c.path }}">
         {{ img(c.img, [360, 640], alt=c.name, sizes='(max-width: 640px) 50vw, (max-width: 1100px) 33vw, 290px') }}
         <span class="tile__body"><strong>{{ c.name }}</strong>{% if c.range %}<small>{{ c.range }}</small>{% endif %}</span>
@@ -33,12 +33,13 @@
 
 <section class="section" data-catalog {% if show_tiles %}id="all"{% endif %}>
   <div class="wrap">
-    {% if show_tiles %}<div class="section-head"><div><span class="eyebrow">Full catalogue</span><h2>All products</h2></div></div>{% endif %}
+    {% if show_tiles %}<div class="section-head"><div><span class="eyebrow">Full catalogue</span><h2>{{ 'All models' if tiles else 'All products' }}</h2></div></div>{% endif %}
     <div class="catalog">
       <aside class="sidebar" aria-label="Product categories">
         <h2>Categories</h2>
         <nav class="tree">
-          <ul><li><a href="/products/"{% if current == '/products/' %} aria-current="page"{% endif %}>All products <span>{{ product_total }}</span></a></li></ul>
+          {% set root = tree_root or {'name': 'All products', 'path': '/products/', 'count': product_total} %}
+          <ul><li><a href="{{ root.path }}"{% if current == root.path %} aria-current="page"{% endif %}>{{ root.name }} <span>{{ root.count }}</span></a></li></ul>
           {{ tree_nodes(tree) }}
         </nav>
       </aside>
@@ -58,15 +59,5 @@
   </div>
 </section>
 
-{% if faq %}
-<section class="section section--soft">
-  <div class="wrap">
-    <div class="section-head" style="justify-content:center;text-align:center"><div><span class="eyebrow">Good to know</span><h2>Frequently asked questions</h2></div></div>
-    <div class="faq">
-      {% for f in faq %}<details><summary>{{ f.q }} {{ icon('plus') }}</summary><div>{{ f.a|links|safe }}</div></details>{% endfor %}
-    </div>
-  </div>
-</section>
-{% endif %}
 {{ cta() }}
 {% endblock %}

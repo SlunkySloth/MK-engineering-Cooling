@@ -29,6 +29,19 @@
   $$('[data-drawer-close]').forEach(b => b.addEventListener('click', () => toggleDrawer(false)));
   drawer?.addEventListener('click', e => { if (e.target.closest('a')) toggleDrawer(false); });
 
+  /* Products mega menu: hovering or focusing a brand shows its ranges */
+  $$('[data-mega]').forEach(menu => {
+    const tabs = $$('[data-brand]', menu), panels = $$('[data-panel]', menu);
+    const show = i => {
+      tabs.forEach(t => t.classList.toggle('is-active', t.dataset.brand === i));
+      panels.forEach(p => { p.hidden = p.dataset.panel !== i; });
+    };
+    tabs.forEach(t => {
+      t.addEventListener('mouseenter', () => show(t.dataset.brand));
+      t.addEventListener('focus', () => show(t.dataset.brand));
+    });
+  });
+
   /* Close desktop menus on Escape */
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && document.activeElement?.closest('.nav__item')) document.activeElement.blur();
@@ -176,7 +189,7 @@
     const cards = $$('.product-card', root);
     const grid = $('.products', root);
     const q = $('[data-filter-q]', root), sort = $('[data-filter-sort]', root);
-    const chips = $$('[data-filter-cat]', root);
+    const chips = $$('[data-filter-cat]');  // the chips sit in the page header, above the catalogue
     const count = $('.count', root), empty = $('.empty', root);
     const params = new URLSearchParams(location.search);
     let cat = params.get('cat') || '';

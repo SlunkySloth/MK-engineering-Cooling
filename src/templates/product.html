@@ -24,7 +24,7 @@
       </div>
 
       <div class="pdp__info">
-        <a class="pill" href="{{ p.primary_cat }}">{{ p.primary_cat_name }}</a>
+        <a class="pill" href="{{ p.primary_cat }}">{% if p.brand %}{{ p.brand }} · {% endif %}{{ p.primary_cat_name }}</a>
         <h1>{{ p.name }}</h1>
         {% if p.highlights %}
         <div class="highlights">
@@ -32,11 +32,15 @@
         </div>
         {% endif %}
         <div class="pdp__actions">
-          <button class="btn btn--primary" type="button" data-enquire="{{ p.name }}">Request a quote {{ icon('arrow') }}</button>
+          <button class="btn btn--primary" type="button" data-enquire="{% if p.brand %}{{ p.brand }} {% endif %}{{ p.name }}">Request a quote {{ icon('arrow') }}</button>
           {% if p.brochure %}<a class="btn btn--ghost" href="{{ p.brochure|link }}" target="_blank" rel="noopener">{{ icon('download') }} Brochure (PDF)</a>{% endif %}
           <button class="btn btn--ghost" type="button" data-compare="{{ p.url }}" aria-pressed="false">{{ icon('compare') }} <span>Add to compare</span></button>
           <button class="btn btn--ghost" type="button" data-share aria-label="Share this product">{{ icon('share') }} <span>Share</span></button>
         </div>
+        {% if p.features %}
+        <h2 style="font-size:1.2rem;margin-top:32px">Key features</h2>
+        <ul class="checklist">{% for f in p.features %}<li><span>{{ f }}</span></li>{% endfor %}</ul>
+        {% endif %}
         {% if p.specs %}
         <h2 style="font-size:1.2rem;margin-top:32px">Specifications</h2>
         <table class="specs">
@@ -76,7 +80,7 @@
   <div class="wrap">
     <div class="section-head">
       <div><span class="eyebrow">You may also like</span><h2>Related products</h2></div>
-      <a class="btn btn--ghost" href="{{ p.primary_cat }}">All {{ p.primary_cat_name }} {{ icon('arrow') }}</a>
+      <a class="btn btn--ghost" href="{{ p.primary_cat }}">All {% if p.brand %}{{ p.brand }} {% endif %}{{ p.primary_cat_name }} {{ icon('arrow') }}</a>
     </div>
     <div class="products products--4">{% for r in related %}{{ product_card(r) }}{% endfor %}</div>
   </div>
