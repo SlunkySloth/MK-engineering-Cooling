@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon, img, cta with context %}
+{% block head %}{% set hero = images(home.intro.img, [640, 1080]) %}{% if hero %}<link rel="preload" as="image" href="{{ hero.src }}" imagesrcset="{{ hero.srcset }}" imagesizes="(max-width: 900px) 100vw, 45vw">{% endif %}{% endblock %}
+{% block main %}
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">{{ home.intro.eyebrow }}</span>
+      <h1>Future of <span>Cooling</span> Solutions</h1>
+      <p class="lead">{{ home.intro.html|links|safe }}</p>
+      <div class="btn-row">
+        <a class="btn btn--primary" href="/products/">Explore {{ product_total }} products {{ icon('arrow') }}</a>
+        <button class="btn btn--ghost" type="button" data-enquire="">Talk to sales</button>
+      </div>
+    </div>
+    <div class="hero__media">{{ img(home.intro.img, [640, 1080], alt='Visi cooler, pastry cabinet, deep freezer and ice machine', eager=True, sizes='(max-width: 900px) 100vw, 45vw') }}</div>
+  </div>
+</section>
+
+<section class="section" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="section-head"><div><span class="eyebrow">What's new</span><h2>Latest launches</h2></div></div>
+    <div class="carousel" data-carousel aria-roledescription="carousel" aria-label="Latest launches">
+      <div class="carousel__track">
+        {% for b in home.banners %}{% set d = images(b.img, [960, 1600, 1900]) %}{% set m = images(b.mobile, [560]) if b.mobile else None %}
+        <div class="carousel__slide" role="group" aria-roledescription="slide" aria-label="{{ loop.index }} of {{ loop.length }}">
+          {% if b.href %}<a href="{{ b.href|link }}">{% endif %}
+          <picture>
+            {% if m %}<source media="(max-width: 640px)" srcset="{{ m.srcset }}" width="{{ m.width }}" height="{{ m.height }}">{% endif %}
+            <img src="{{ d.src }}" srcset="{{ d.srcset }}" sizes="(max-width: 1240px) 100vw, 1180px" width="{{ d.width }}" height="{{ d.height }}" alt="{{ b.alt }}" {% if loop.first %}fetchpriority="low"{% else %}loading="lazy"{% endif %} decoding="async">
+          </picture>
+          {% if b.href %}</a>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="carousel__nav">
+        <button type="button" data-prev aria-label="Previous slide">{{ icon('left') }}</button>
+        <button type="button" data-next aria-label="Next slide">{{ icon('right') }}</button>
+      </div>
+      <div class="carousel__dots"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow">Our product range</span><h2>Equipment for every cold chain</h2><p class="lead" style="margin:0">From counter-top coolers to stainless steel kitchen lines, ice machines and medical refrigeration.</p></div>
+      <a class="btn btn--ghost" href="/products/">View all products {{ icon('arrow') }}</a>
+    </div>
+    <div class="tiles">
+      {% for c in range_cards %}
+      <a class="tile" href="{{ c.path }}">
+        {{ img(c.img, [360, 640], alt=c.name, sizes='(max-width: 640px) 50vw, (max-width: 1100px) 33vw, 290px') }}
+        <span class="tile__body"><strong>{{ c.name }}</strong>{% if c.range %}<small>{{ c.range }}</small>{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow">Industries we serve</span><h2>Built for the way you serve</h2><p class="lead" style="margin:0">{{ home.industry_intro|links|safe }}</p></div>
+      <a class="btn btn--ghost" href="/industries/">All industries {{ icon('arrow') }}</a>
+    </div>
+    <div class="industry-grid">
+      {% for ind in home.industries %}
+      <a class="industry" href="{{ ind.href }}">
+        {{ img(ind.img, [400, 640], alt='', sizes='(max-width: 640px) 50vw, 290px') }}
+        <div><h3>{{ ind.title }}</h3><p>{{ ind.text|replace('<br/>', '')|safe }}</p><span class="link-arrow">Explore {{ icon('arrow') }}</span></div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft" style="overflow:hidden">
+  <div class="wrap">
+    <div class="section-head" style="justify-content:center;text-align:center"><div><span class="eyebrow">We are</span><h2>Trusted by the best</h2></div></div>
+  </div>
+  <div class="marquee">
+    <div class="marquee__track">
+      {% for pass in range(6) %}{% for c in site.clients %}<div class="marquee__item"{% if pass %} aria-hidden="true"{% endif %}>{% if c.img %}{{ img(c.img, [200, 400], alt='' if pass else c.name, sizes='160px') }}{% else %}<span class="marquee__name">{{ c.name }}</span>{% endif %}</div>{% endfor %}{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section" style="overflow:hidden">
+  <div class="wrap">
+    <div class="section-head" style="justify-content:center;text-align:center"><div><span class="eyebrow">Our brands</span><h2>Brands we deal with</h2></div></div>
+  </div>
+  <div class="marquee marquee--reverse">
+    <div class="marquee__track">
+      {% for pass in range(2) %}{% for c in site.brands %}<div class="marquee__item"{% if pass %} aria-hidden="true"{% endif %}>{% if c.img %}{{ img(c.img, [200, 400], alt='' if pass else c.name, sizes='160px') }}{% else %}<span class="marquee__name">{{ c.name }}</span>{% endif %}</div>{% endfor %}{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow">Insights</span><h2>From the blog</h2></div>
+      <a class="btn btn--ghost" href="/blog/">All articles {{ icon('arrow') }}</a>
+    </div>
+    <div class="post-grid">
+      {% for p in posts[:3] %}
+      <a class="post-card" href="{{ p.url }}">
+        <div class="post-card__img">{{ img(p.img, [480, 800], alt='', sizes='(max-width: 640px) 100vw, 33vw') }}</div>
+        <div class="meta">{% if p.category %}<span class="pill">{{ p.category }}</span>{% endif %}<time datetime="{{ p.date }}">{{ p.date|nicedate }}</time></div>
+        <h3>{{ p.title }}</h3>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{{ cta() }}
+{% endblock %}

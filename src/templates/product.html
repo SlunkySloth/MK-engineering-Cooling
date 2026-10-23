@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import icon, img, crumbs, product_card, cta with context %}
+{% block head %}{% set first = images(p.images[0], [560, 900, 1400]) if p.images else None %}{% if first %}<link rel="preload" as="image" href="{{ first.src }}" imagesrcset="{{ first.srcset }}" imagesizes="(max-width: 900px) 100vw, 55vw">{% endif %}{% endblock %}
+{% block main %}
+<section class="section" style="padding-top:clamp(24px,4vw,40px)">
+  <div class="wrap">
+    {{ crumbs(trail) }}
+    <div class="pdp">
+      <div class="gallery" data-gallery>
+        {% set main = images(p.images[0], [560, 900, 1400]) %}
+        <button class="gallery__main" type="button" aria-label="Enlarge image">
+          {% if main %}<img src="{{ main.src }}" srcset="{{ main.srcset }}" sizes="(max-width: 900px) 100vw, 55vw" width="{{ main.width }}" height="{{ main.height }}" alt="{{ p.name }}" fetchpriority="high">{% endif %}
+          <span class="gallery__zoom">{{ icon('zoom') }}</span>
+        </button>
+        {% if p.images|length > 1 %}
+        <div class="thumbs" role="group" aria-label="Product images">
+          {% for src in p.images %}{% set t = images(src, [160]) %}{% set l = images(src, [560, 900, 1400]) %}{% set xl = images(src, [1600]) %}
+          <button type="button" data-src="{{ l.src }}" data-srcset="{{ l.srcset }}" data-large="{{ xl.src }}" aria-current="{{ 'true' if loop.first else 'false' }}" aria-label="Show image {{ loop.index }}">
+            <img src="{{ t.src }}" width="{{ t.width }}" height="{{ t.height }}" alt="" loading="lazy">
+          </button>
+          {% endfor %}
+        </div>
+        {% else %}{% set xl = images(p.images[0], [1600]) %}<div class="thumbs" hidden><button type="button" data-src="{{ main.src }}" data-srcset="{{ main.srcset }}" data-large="{{ xl.src }}" aria-current="true"></button></div>{% endif %}
+      </div>
+
+      <div class="pdp__info">
+        <a class="pill" href="{{ p.primary_cat }}">{% if p.brand %}{{ p.brand }} · {% endif %}{{ p.primary_cat_name }}</a>
+        <h1>{{ p.name }}</h1>
+        {% if p.highlights %}
+        <div class="highlights">
+          {% for s in p.highlights %}<div class="highlight"><span>{{ s.label|safe }}</span><strong>{{ s.value|safe }}</strong></div>{% endfor %}
+        </div>
+        {% endif %}
+        <div class="pdp__actions">
+          <button class="btn btn--primary" type="button" data-enquire="{% if p.brand %}{{ p.brand }} {% endif %}{{ p.name }}">Request a quote {{ icon('arrow') }}</button>
+          {% if p.brochure %}<a class="btn btn--ghost" href="{{ p.brochure|link }}" target="_blank" rel="noopener">{{ icon('download') }} Brochure (PDF)</a>{% endif %}
+          <button class="btn btn--ghost" type="button" data-compare="{{ p.url }}" aria-pressed="false">{{ icon('compare') }} <span>Add to compare</span></button>
+          <button class="btn btn--ghost" type="button" data-share aria-label="Share this product">{{ icon('share') }} <span>Share</span></button>
+        </div>
+        {% if p.features %}
+        <h2 style="font-size:1.2rem;margin-top:32px">Key features</h2>
+        <ul class="checklist">{% for f in p.features %}<li><span>{{ f }}</span></li>{% endfor %}</ul>
+        {% endif %}
+        {% if p.specs %}
+        <h2 style="font-size:1.2rem;margin-top:32px">Specifications</h2>
+        <table class="specs">
+          <tbody>
+          {% for s in p.specs %}<tr>{% if s.label %}<th scope="row">{{ s.label|safe }}</th><td>{{ s.value|links|safe }}</td>{% else %}<td colspan="2">{{ s.value|links|safe }}</td>{% endif %}</tr>{% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% for n in p.notes %}<p class="muted" style="margin-top:16px">{{ n|links|safe }}</p>{% endfor %}
+        {% if p.tags %}
+        <div class="tags" style="margin-top:22px">Tags: {% for t in p.tags %}<a href="{{ t.path|link }}">{{ t.name }}</a>{% endfor %}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if p.hotspot %}
+<section class="section section--soft">
+  <div class="wrap">
+    <div class="section-head"><div><span class="eyebrow">Features</span><h2>Designed in the details</h2></div></div>
+    <div class="hotspots" data-hotspots>
+      <div class="hotspots__figure">
+        {{ img(p.hotspot.image, [800, 1400], alt=p.name ~ ' feature diagram', sizes='(max-width: 900px) 100vw, 60vw') }}
+        {% for pt in p.hotspot.points %}<button class="dot" type="button" style="top:{{ pt.top }}%;left:{{ pt.left }}%" data-n="{{ loop.index0 }}" aria-label="{{ pt.title }}">{{ loop.index }}</button>{% endfor %}
+      </div>
+      <ol class="feature-list">
+        {% for pt in p.hotspot.points %}<li data-n="{{ loop.index0 }}" tabindex="0">{{ pt.title }}{% if pt.text %} — {{ pt.text }}{% endif %}</li>{% endfor %}
+      </ol>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if related %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><span class="eyebrow">You may also like</span><h2>Related products</h2></div>
+      <a class="btn btn--ghost" href="{{ p.primary_cat }}">All {% if p.brand %}{{ p.brand }} {% endif %}{{ p.primary_cat_name }} {{ icon('arrow') }}</a>
+    </div>
+    <div class="products products--4">{% for r in related %}{{ product_card(r) }}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+{{ cta('Need ' ~ p.name ~ ' for your business?', 'Share your requirement and our team will get back with pricing, delivery timelines and installation details.') }}
+{% endblock %}
+{% block dialogs %}
+<dialog id="lightbox" class="lightbox" aria-label="{{ p.name }} image">
+  <div class="dialog__head"><button class="icon-btn" type="button" data-close aria-label="Close">{{ icon('close') }}</button></div>
+  <img alt="">
+</dialog>
+{% endblock %}

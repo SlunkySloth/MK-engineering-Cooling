@@ -2,7 +2,7 @@
 from pathlib import Path
 import re,json,subprocess,concurrent.futures as cf
 from urllib.parse import unquote,urlsplit
-r=Path(__file__).parent/'dist';refs=set()
+r=Path(__file__).parent/'source';refs=set()
 for p in r.rglob('*'):
  if not p.is_file() or p.suffix not in {'.html','.css'}:continue
  s=p.read_text(errors='replace')

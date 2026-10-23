@@ -6,7 +6,7 @@ from urllib.parse import urljoin, urlsplit, unquote
 import requests
 from bs4 import BeautifulSoup
 BASE='https://westernequipments.com/'
-ROOT=Path(__file__).parent/'dist'
+ROOT=Path(__file__).parent/'source'
 CACHE=Path(__file__).parent/'.capture'
 CACHE.mkdir(exist_ok=True)
 ROOT.mkdir(exist_ok=True)
