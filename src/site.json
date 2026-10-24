@@ -1,6 +1,6 @@
 {
-  "name": "Western Refrigeration",
-  "legal_name": "Western Refrigeration Private Limited",
+  "name": "MK Engineering",
+  "legal_name": "MK Engineering",
   "tagline": "Commercial refrigeration supply, installation and service across Tamil Nadu, from our offices in Trichy and Madurai",
   "logo": "/wp-content/uploads/mk/mk-engineering-logo.png",
   "favicon": "/wp-content/uploads/mk/mk-engineering-icon.png",
@@ -23,92 +23,115 @@
   "locations": [
     {
       "name": "Madurai",
-      "address": "No.12, Shop:2, 70 Feet Main Road, New Ellis Nagar, Madurai\u00a0-\u00a0625\u00a0016",
+      "address": "No.12, Shop:2, 70 Feet Main Road, New Ellis Nagar, Madurai - 625 016",
       "maps_url": "https://www.google.com/maps/search/?api=1&query=No.12%2C+Shop+2%2C+70+Feet+Main+Road%2C+New+Ellis+Nagar%2C+Madurai+625016"
     },
     {
       "name": "Trichy",
-      "address": "68/1A Viswas Nagar 1st Street, Tharanallur, Old Palpannai, Trichy\u00a0-\u00a0620\u00a0008",
+      "address": "68/1A Viswas Nagar 1st Street, Tharanallur, Old Palpannai, Trichy - 620 008",
       "maps_url": "https://www.google.com/maps/search/?api=1&query=68%2F1A+Viswas+Nagar+1st+Street%2C+Tharanallur%2C+Old+Palpannai%2C+Trichy+620008"
     }
   ],
   "social": [
-    {
-      "name": "LinkedIn",
-      "url": "https://www.linkedin.com/company/western-refrigeration-pvt-ltd/"
-    },
     {
       "name": "Facebook",
       "url": "https://www.facebook.com/mkengineering.try"
     }
   ],
   "brands": [
-    {"name": "Western", "img": "/wp-content/uploads/mk/brands/western.png"},
-    {"name": "Elanpro", "img": "/wp-content/uploads/mk/brands/elanpro.png"},
-    {"name": "Voltas", "img": "/wp-content/uploads/mk/brands/voltas.png"},
-    {"name": "Carrier", "img": "/wp-content/uploads/mk/brands/carrier.png"},
-    {"name": "Midea", "img": "/wp-content/uploads/mk/brands/midea.png"},
-    {"name": "Blue Star", "img": null},
-    {"name": "Symphony", "img": "/wp-content/uploads/mk/brands/symphony.png"},
-    {"name": "O General", "img": null},
-    {"name": "Mitsubishi Heavy Industries", "img": "/wp-content/uploads/mk/brands/mhi.png"},
-    {"name": "Daikin", "img": "/wp-content/uploads/mk/brands/daikin.png"},
-    {"name": "Rinac", "img": null},
-    {"name": "Emerson", "img": "/wp-content/uploads/mk/brands/emerson.png"},
-    {"name": "Tecumseh", "img": "/wp-content/uploads/mk/brands/tecumseh.png"},
-    {"name": "Bitzer", "img": "/wp-content/uploads/mk/brands/bitzer.png"}
+    {
+      "name": "Western",
+      "img": "/wp-content/uploads/mk/brands/western.png"
+    },
+    {
+      "name": "Elanpro",
+      "img": "/wp-content/uploads/mk/brands/elanpro.png"
+    },
+    {
+      "name": "Voltas",
+      "img": "/wp-content/uploads/mk/brands/voltas.png"
+    },
+    {
+      "name": "Carrier",
+      "img": "/wp-content/uploads/mk/brands/carrier.png"
+    },
+    {
+      "name": "Midea",
+      "img": "/wp-content/uploads/mk/brands/midea.png"
+    },
+    {
+      "name": "Blue Star",
+      "img": null
+    },
+    {
+      "name": "Symphony",
+      "img": "/wp-content/uploads/mk/brands/symphony.png"
+    },
+    {
+      "name": "O General",
+      "img": null
+    },
+    {
+      "name": "Mitsubishi Heavy Industries",
+      "img": "/wp-content/uploads/mk/brands/mhi.png"
+    },
+    {
+      "name": "Daikin",
+      "img": "/wp-content/uploads/mk/brands/daikin.png"
+    },
+    {
+      "name": "Rinac",
+      "img": null
+    },
+    {
+      "name": "Emerson",
+      "img": "/wp-content/uploads/mk/brands/emerson.png"
+    },
+    {
+      "name": "Tecumseh",
+      "img": "/wp-content/uploads/mk/brands/tecumseh.png"
+    },
+    {
+      "name": "Bitzer",
+      "img": "/wp-content/uploads/mk/brands/bitzer.png"
+    }
   ],
   "clients": [
-    {"name": "Aavin", "img": "/wp-content/uploads/mk/clients/aavin.png"},
-    {"name": "Hatsun Agro Product", "img": "/wp-content/uploads/mk/clients/hatsun.png"},
-    {"name": "Arokya", "img": "/wp-content/uploads/mk/clients/arokya.png"},
-    {"name": "Feel Laban", "img": "/wp-content/uploads/mk/clients/feel-laban.png"},
-    {"name": "Nutrice Ice Cream", "img": "/wp-content/uploads/mk/clients/nutrice.png"},
-    {"name": "BHEL", "img": "/wp-content/uploads/mk/clients/bhel.png"}
-  ],
-  "stats": [
     {
-      "value": "1972",
-      "label": "Founded in Mumbai"
+      "name": "Aavin",
+      "img": "/wp-content/uploads/mk/clients/aavin.png"
     },
     {
-      "value": "4",
-      "label": "Manufacturing plants in India"
+      "name": "Hatsun Agro Product",
+      "img": "/wp-content/uploads/mk/clients/hatsun.png"
     },
     {
-      "value": "1M+",
-      "label": "Units of annual capacity"
+      "name": "Arokya",
+      "img": "/wp-content/uploads/mk/clients/arokya.png"
     },
     {
-      "value": "45+",
-      "label": "Countries served"
+      "name": "Feel Laban",
+      "img": "/wp-content/uploads/mk/clients/feel-laban.png"
+    },
+    {
+      "name": "Nutrice Ice Cream",
+      "img": "/wp-content/uploads/mk/clients/nutrice.png"
+    },
+    {
+      "name": "BHEL",
+      "img": "/wp-content/uploads/mk/clients/bhel.png"
     }
   ],
   "company_nav": [
     {
       "label": "About us",
       "path": "/about-us/",
-      "text": "Our story, values and leadership"
+      "text": "Who we are and what we do"
     },
     {
-      "label": "Factories",
-      "path": "/factories/",
-      "text": "Four plants across Maharashtra and Gujarat"
-    },
-    {
-      "label": "Research & Development",
-      "path": "/research/",
-      "text": "Testing labs and engineering"
-    },
-    {
-      "label": "Sustainability",
-      "path": "/sustainability/",
-      "text": "Solar, SBTi targets, e-waste"
-    },
-    {
-      "label": "Careers",
-      "path": "/careers/",
-      "text": "Culture and opportunities"
+      "label": "Installation & service",
+      "path": "/service/",
+      "text": "Installation and after-sales support"
     }
   ],
   "industries_nav": [
@@ -135,28 +158,16 @@
   ],
   "footer_links": [
     {
-      "label": "Blog",
-      "path": "/blog/"
+      "label": "About us",
+      "path": "/about-us/"
     },
     {
-      "label": "Careers",
-      "path": "/careers/"
-    },
-    {
-      "label": "Service network",
+      "label": "Installation & service",
       "path": "/service/"
     },
     {
-      "label": "Cashback offers",
-      "path": "/cashback-offers/"
-    },
-    {
-      "label": "No gift policy",
-      "path": "/no-gift-policy/"
-    },
-    {
-      "label": "Supplier code of conduct",
-      "path": "https://westernequipments.com/wp-content/uploads/2024/04/Supplier-Code-of-Conduct_Signed.pdf"
+      "label": "Contact us",
+      "path": "/contact-us/"
     }
   ]
 }

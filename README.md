@@ -1,6 +1,6 @@
 # MK-engineering-Cooling
 
-Static website for a commercial refrigeration catalogue. The content (products, specifications, images, company pages, blog) comes from a capture of https://westernequipments.com/ kept in `source/`. A build script turns it into a fast, lightweight site in `dist/`.
+Website of MK Engineering, live at https://www.mkengg.in. Static site for a commercial refrigeration catalogue (Western Equipments, Symphony and Elanpro). The content (products, specifications, images, company pages, blog) comes from a capture of https://westernequipments.com/ kept in `source/`. A build script turns it into a fast, lightweight site in `dist/`.
 
 ## Preview
 
@@ -40,3 +40,5 @@ The first build converts every image to WebP (about 3 minutes). Later builds reu
 - The e-waste collection-point locator and the careers application form needed the original server and are not included.
 
 `mirror.py` captures public pages and assets into `source/` (`.capture/` is its download cache). Source content and brand assets belong to their respective owners.
+
+For a full guide to the project (architecture, brands, deployment, known issues), see `AGENTS.md` and the `docs/` folder.

@@ -7,10 +7,9 @@
     <div class="info-list">
       <div class="info">{{ icon('phone') }}<div><h3>Call us</h3>{% for p in site.phones %}<p><a href="tel:{{ p.tel }}">{{ p.display }}</a>{% if p.label %} · {{ p.label }}{% endif %}</p>{% endfor %}</div></div>
       <div class="info">{{ icon('mail') }}<div><h3>Email</h3>{% for e in site.emails %}<p><a href="mailto:{{ e }}">{{ e }}</a></p>{% endfor %}</div></div>
-      {% for o in contact.offices %}
-      <div class="info">{{ icon('pin') }}<div><h3>{{ o.title }}</h3><p>{{ o.html|safe }}</p></div></div>
+      {% for l in site.locations %}
+      <div class="info">{{ icon('pin') }}<div><h3>{{ l.name }} office</h3><p>{{ l.address }}</p><a class="link-arrow" href="{{ l.maps_url }}" target="_blank" rel="noopener">Get directions {{ icon('arrow') }}</a></div></div>
       {% endfor %}
-      <div class="info">{{ icon('pin') }}<div><h3>Factories</h3><p>Shahpur (Maharashtra), Silvassa, Sanjan and Tadgam (Gujarat). <a href="/factories/">Visit our plants →</a></p></div></div>
     </div>
     <div class="form-card">
       <span class="eyebrow">Send an enquiry</span>
@@ -22,12 +21,12 @@
         <label>Area / City<input class="input" name="city" data-label="City" autocomplete="address-level2"></label>
         <label class="full">Department
           <select class="select" name="department" data-label="Department" style="width:100%">
-            {% for d in contact.departments %}<option>{{ d }}</option>{% endfor %}
+            {% for d in ['Sales & product advice', 'Installation', 'Service'] %}<option>{{ d }}</option>{% endfor %}
           </select>
         </label>
         <fieldset class="full">
           <legend>Products you're interested in</legend>
-          <div class="checks">{% for c in contact.interests %}<label><input type="checkbox" name="interest" data-label="Interested in" value="{{ c }}"> {{ c }}</label>{% endfor %}</div>
+          <div class="checks">{% for c in contact.interests + ['Air Cooler / Tower Fan', 'Pharma & Laboratory Refrigeration'] %}<label><input type="checkbox" name="interest" data-label="Interested in" value="{{ c }}"> {{ c }}</label>{% endfor %}</div>
         </fieldset>
         <label class="full">Message<textarea class="input" name="message" data-label="Message"></textarea></label>
         <div class="full btn-row" style="justify-content:space-between;align-items:center">
@@ -38,10 +37,11 @@
     </div>
   </div>
 </section>
-{% if contact.maps %}
+{% if site.locations %}
 <section class="section" style="padding-top:0">
   <div class="wrap">
-    <iframe class="map" src="{{ contact.maps[0] }}" title="Map of head office" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    {% set l = site.locations[0] %}
+    <iframe class="map" src="https://maps.google.com/maps?q={{ l.maps_url.split('query=')[1] }}&amp;output=embed" title="Map of our {{ l.name }} office" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
 </section>
 {% endif %}

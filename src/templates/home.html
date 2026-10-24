@@ -5,12 +5,12 @@
 <section class="hero">
   <div class="wrap">
     <div>
-      <span class="eyebrow">{{ home.intro.eyebrow }}</span>
-      <h1>Future of <span>Cooling</span> Solutions</h1>
-      <p class="lead">{{ home.intro.html|links|safe }}</p>
+      <span class="eyebrow">{{ mk.eyebrow }}</span>
+      <h1>{{ mk.title_html|safe }}</h1>
+      <p class="lead">{{ mk.lead|safe }}</p>
       <div class="btn-row">
-        <a class="btn btn--primary" href="/products/">Explore {{ product_total }} products {{ icon('arrow') }}</a>
-        <button class="btn btn--ghost" type="button" data-enquire="">Talk to sales</button>
+        <a class="btn btn--primary" href="/products/">Explore {{ all_products }} products {{ icon('arrow') }}</a>
+        <button class="btn btn--ghost" type="button" data-enquire="">Talk to us</button>
       </div>
     </div>
     <div class="hero__media">{{ img(home.intro.img, [640, 1080], alt='Visi cooler, pastry cabinet, deep freezer and ice machine', eager=True, sizes='(max-width: 900px) 100vw, 45vw') }}</div>
@@ -19,8 +19,8 @@
 
 <section class="section" style="padding-bottom:0">
   <div class="wrap">
-    <div class="section-head"><div><span class="eyebrow">What's new</span><h2>Latest launches</h2></div></div>
-    <div class="carousel" data-carousel aria-roledescription="carousel" aria-label="Latest launches">
+    <div class="section-head"><div><span class="eyebrow">Featured</span><h2>New from Western</h2></div></div>
+    <div class="carousel" data-carousel aria-roledescription="carousel" aria-label="New from Western">
       <div class="carousel__track">
         {% for b in home.banners %}{% set d = images(b.img, [960, 1600, 1900]) %}{% set m = images(b.mobile, [560]) if b.mobile else None %}
         <div class="carousel__slide" role="group" aria-roledescription="slide" aria-label="{{ loop.index }} of {{ loop.length }}">
@@ -78,7 +78,7 @@
 
 <section class="section section--soft" style="overflow:hidden">
   <div class="wrap">
-    <div class="section-head" style="justify-content:center;text-align:center"><div><span class="eyebrow">We are</span><h2>Trusted by the best</h2></div></div>
+    <div class="section-head" style="justify-content:center;text-align:center"><div><span class="eyebrow">Our clients</span><h2>Trusted by businesses we serve</h2></div></div>
   </div>
   <div class="marquee">
     <div class="marquee__track">
@@ -98,23 +98,6 @@
   </div>
 </section>
 
-<section class="section section--soft">
-  <div class="wrap">
-    <div class="section-head">
-      <div><span class="eyebrow">Insights</span><h2>From the blog</h2></div>
-      <a class="btn btn--ghost" href="/blog/">All articles {{ icon('arrow') }}</a>
-    </div>
-    <div class="post-grid">
-      {% for p in posts[:3] %}
-      <a class="post-card" href="{{ p.url }}">
-        <div class="post-card__img">{{ img(p.img, [480, 800], alt='', sizes='(max-width: 640px) 100vw, 33vw') }}</div>
-        <div class="meta">{% if p.category %}<span class="pill">{{ p.category }}</span>{% endif %}<time datetime="{{ p.date }}">{{ p.date|nicedate }}</time></div>
-        <h3>{{ p.title }}</h3>
-      </a>
-      {% endfor %}
-    </div>
-  </div>
-</section>
 
 {{ cta() }}
 {% endblock %}

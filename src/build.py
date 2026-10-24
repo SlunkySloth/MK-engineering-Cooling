@@ -17,6 +17,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup
 
 import extract as X
+import mk_content as MK
 import elanpro
 import symphony
 from images import Images
@@ -26,17 +27,10 @@ SRC = Path(__file__).resolve().parent
 DIST = ROOT / 'dist'
 ORIGIN = X.ORIGIN
 
-PAGE_TITLES = {
-    '/about-us/': ('About us', 'company'),
-    '/factories/': ('Factories', 'company'),
-    '/research/': ('Research & Development', 'company'),
-    '/sustainability/': ('Sustainability', 'company'),
-    '/careers/': ('Careers', 'company'),
-    '/industries/': ('Industries', 'industries'),
-    '/service/': ('Service', 'service'),
-    '/no-gift-policy/': ('No Gift Policy', ''),
-    '/cashback-offers/': ('Cashback Offers', ''),
-}
+PAGE_TITLES = {'/industries/': ('Industries', 'industries')}  # captured pages still published
+# Western's own corporate pages and blog are not published; MK writes its own About and Service pages.
+REMOVED_PATHS = ('/factories/', '/research/', '/sustainability/', '/careers/', '/no-gift-policy/',
+                 '/cashback-offers/', '/blog/')
 SKIP_SECTIONS = {'E-Waste Location'}  # interactive locator that depended on the old server
 TYPOS = {'Recommeded products': 'Recommended products', 'Lenght:': 'Length:', 'expIore': 'explore'}
 SPEC_PRIORITY = ['gross vol', 'net vol', 'capacity', 'production', 'ice production', 'temperature', 'storage', 'external dimension', 'dimension', 'refrigerant']
@@ -84,6 +78,8 @@ class Site:
         if path and not path.endswith('/') and not re.search(r'\.\w{2,5}$', path):
             path += '/'
         path = self.aliases.get(path, path)
+        if path.startswith(REMOVED_PATHS):
+            return '/about-us/'
         if path in self.generated:
             return path + (f'?{query}' if query else '') + (f'#{frag}' if frag else '')
         return ORIGIN + href
@@ -110,10 +106,11 @@ class Site:
         self.cat = X.catalogue()
         self.home = X.home()
         self.timeline = X.timeline()
-        self.posts = X.blog()
+        self.posts = []  # Western's blog is not published
         self.contact = X.contact()
         self.menu = X.menu_products()
-        self.content = {p: X.content_page(p) for p in PAGE_TITLES}
+        self.content = {p: json.loads(MK.rewrite(json.dumps(X.content_page(p), ensure_ascii=False))) for p in PAGE_TITLES}
+        self.home = json.loads(MK.rewrite(json.dumps(self.home, ensure_ascii=False)))
         self.aliases = self.cat['aliases']
         # Dealer brands shown alongside the Western catalogue, in menu order.
         self.brands = [dict(mod.catalogue(), mod=mod) for mod in (symphony, elanpro)]
@@ -135,7 +132,7 @@ class Site:
             post['excerpt'] = re.sub(r'\s+', ' ', re.sub('<[^>]+>', '', first)).strip()
 
         # Every URL we will write, so links can be resolved before rendering.
-        self.generated = {'/', '/products/', '/contact-us/', '/blog/', '/compare/', *PAGE_TITLES, *cats,
+        self.generated = {'/', '/products/', '/contact-us/', '/compare/', '/about-us/', '/service/', *PAGE_TITLES, *cats,
                           *self.cat['tags'], *(p for p, v in products.items() if v['local']),
                           *(post['url'] for post in self.posts), *self.aliases,
                           *(p for b in self.brands for p in (b['mod'].ROOT_PATH, *b['categories'], *b['products']))}
@@ -172,6 +169,17 @@ class Site:
             'key_specs': key,
             'search': re.sub(r'\s+', ' ', f"{p['name']} {p['primary_cat_name']} {spec_text}").lower(),
         }
+
+    @staticmethod
+    def page_title(t):
+        """Captured Western SEO title without its company suffix, e.g. 'Freezer Archives - Western Refrigeration: ...'."""
+        t = re.split(r'\s+[-|–]\s+Western Refrigeration', t)[0]
+        return re.sub(r'\s+Archives$', '', t).strip()
+
+    @staticmethod
+    def page_description(d, fallback):
+        """Captured description, unless it describes Western as the company."""
+        return fallback if not d or re.search(r'Western Refrigeration|Hoshizaki Corporation|largest|manufacturer', d, re.I) else d
 
     def highlights(self, p):
         out = []
@@ -380,7 +388,8 @@ class Site:
             b['alt'] = f"{target['name']} – {target['primary_cat_name']}" if target else 'Featured product range'
         self.write('/', env.get_template('home.html').render(
             home=self.home, posts=self.posts,
-            meta_title=self.home['meta_title'], meta_description=self.home['meta_description'], **common))
+            mk=MK.HOME, all_products=len(products) + sum(len(b['products']) for b in self.brands),
+            meta_title=MK.HOME['meta_title'], meta_description=MK.HOME['meta_description'], **common))
 
         # Catalogue: all products
         top = self.cat['tree']
@@ -414,8 +423,8 @@ class Site:
             self.write(path, env.get_template('catalog.html').render(
                 title=n['name'], trail=crumbs_for(n['path']), lead=lead, chips=chips, chips_label='Sub-categories',
                 current=n['path'], open_paths=open_paths, tree=top, items=members,
-                section='products', meta_title=n.get('meta_title') or f"{n['name']} | {self.config['name']}",
-                meta_description=n.get('meta_description') or f"{n['name']} range from {self.config['name']}: {lead}.",
+                section='products', meta_title=f"{self.page_title(n.get('meta_title') or n['name'])} | {self.config['name']}",
+                meta_description=self.page_description(n.get('meta_description'), f"Western {n['name']} range from {self.config['name']}: {lead}."),
                 **common))
 
         # Tags
@@ -439,7 +448,7 @@ class Site:
             self.write(u, env.get_template('product.html').render(
                 p=p, related=[cards[r] for r in rel[:4]], trail=crumbs_for(p['primary_cat']) + [{'name': p['name']}],
                 section='products', meta_title=f"{p['name']} – {p['primary_cat_name']} | {self.config['name']}",
-                meta_description=f"{p['name']} {p['primary_cat_name'].lower()} by {self.config['name']}. {spec_desc}."))
+                meta_description=f"Western {p['name']} {p['primary_cat_name'].lower()}, available from {self.config['name']}. {spec_desc}."))
 
         # Dealer brands: brand catalogue, range pages and product pages
         for b in self.brands:
@@ -448,22 +457,22 @@ class Site:
         # Content pages
         for path, (title, section) in PAGE_TITLES.items():
             sections, lead = self.prepare_sections(path, title)
-            pg = self.content[path]
             self.write(path, env.get_template('content.html').render(
                 title=title, trail=[{'name': title}], lead=lead, eyebrow='', sections=sections, timeline=self.timeline,
-                section=section, show_cta=path not in ('/no-gift-policy/',),
-                meta_title=pg['meta_title'], meta_description=pg['meta_description']))
+                section=section, show_cta=True, meta_title=f"{title} | {self.config['name']}",
+                meta_description=f"Refrigeration and cooling equipment for {title.lower()} from {self.config['name']}: "
+                                 "hotels, restaurants, cafés, retail, dairy and pharma."))
+        brand_menu = env.globals['brand_menu']
+        for path, pg in MK.pages(self.config, brand_menu).items():
+            self.write(path, env.get_template('content.html').render(
+                title=pg['title'], trail=[{'name': pg['title']}], lead=pg['lead'], eyebrow='', sections=pg['sections'],
+                timeline=[], section='company', show_cta=True, meta_title=f"{pg['title']} | {self.config['name']}",
+                meta_description=pg['lead']))
 
         self.write('/contact-us/', env.get_template('contact.html').render(
             contact=self.contact, section='contact', meta_title=f"Contact us | {self.config['name']}",
-            meta_description=f"Contact {self.config['name']} for sales and service: {self.config['phones'][0]['display']}, {self.config['email']}."))
-        self.write('/blog/', env.get_template('blog.html').render(
-            posts=self.posts, section='blog', meta_title=f"Blog | {self.config['name']}"))
-        for post in self.posts:
-            others = [o for o in self.posts if o is not post][:3]
-            self.write(post['url'], env.get_template('post.html').render(
-                post=post, others=others, section='blog', meta_title=f"{post['title']} | {self.config['name']}",
-                meta_description=post['meta_description'] or post['excerpt'][:160]))
+            meta_description=f"Contact {self.config['name']} in Madurai and Trichy for sales, installation and service: "
+                             f"{self.config['phones'][0]['display']}."))
         self.write('/compare/', env.get_template('compare.html').render(section='products', meta_title=f"Compare products | {self.config['name']}"))
         self.write('/404.html', env.get_template('404.html').render(meta_title=f"Page not found | {self.config['name']}"))
 
@@ -487,7 +496,8 @@ class Site:
                 index.append({'t': f"{b['mod'].NAME} {c['name']}", 'u': c['path'], 'k': 'Category', 'c': b['mod'].NAME})
         for path, (title, _) in PAGE_TITLES.items():
             index.append({'t': title, 'u': path, 'k': 'Page'})
-        index += [{'t': 'Contact us', 'u': '/contact-us/', 'k': 'Page'}, {'t': 'Blog', 'u': '/blog/', 'k': 'Page'}]
+        index += [{'t': 'About us', 'u': '/about-us/', 'k': 'Page'}, {'t': 'Installation & service', 'u': '/service/', 'k': 'Page'},
+                  {'t': 'Contact us', 'u': '/contact-us/', 'k': 'Page'}]
         for post in self.posts:
             th = self.img(post['img'], [160])
             index.append({'t': post['title'], 'u': post['url'], 'k': 'Article', 'c': post['category'], 'i': th['src'] if th else ''})

@@ -4,19 +4,7 @@
 {{ page_head(title, trail, lead, eyebrow) }}
 {% block before %}{% endblock %}
 {% for s in sections %}
-  {% if s.special == 'timeline' %}
-  <section class="section section--soft" id="journey">
-    <div class="wrap split" style="align-items:start">
-      <div style="position:sticky;top:calc(var(--header-h) + 32px)">
-        <span class="eyebrow">{{ s.eyebrow }}</span><h2>{{ s.title }}</h2>
-        <p class="lead">Five decades, four plants and a long list of firsts — from trading refrigeration equipment in 1972 to building India's own vending machine.</p>
-      </div>
-      <ol class="timeline">{% for t in timeline %}<li><strong>{{ t.year }}</strong><p>{{ t.title }}</p></li>{% endfor %}</ol>
-    </div>
-  </section>
-  {% else %}
   {{ section(s, loop.index0) }}
-  {% endif %}
 {% endfor %}
 {% block after %}{% endblock %}
 {% if show_cta %}{{ cta() }}{% endif %}

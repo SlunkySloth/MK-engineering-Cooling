@@ -103,16 +103,12 @@
           {% for m in site.industries_nav %}<a href="{{ m.path }}"><strong>{{ m.label }}</strong></a>{% endfor %}
         </div>
       </div>
-      {# Hidden for now; may be used later.
       <div class="nav__item">
         <a class="nav__link" href="/about-us/" {% if section == 'company' %}aria-current="page"{% endif %}>Company {{ icon('down') }}</a>
         <div class="menu">
           {% for m in site.company_nav %}<a href="{{ m.path }}"><strong>{{ m.label }}</strong><small>{{ m.text }}</small></a>{% endfor %}
         </div>
       </div>
-      <div class="nav__item"><a class="nav__link" href="/service/" {% if section == 'service' %}aria-current="page"{% endif %}>Service</a></div>
-      <div class="nav__item"><a class="nav__link" href="/blog/" {% if section == 'blog' %}aria-current="page"{% endif %}>Blog</a></div>
-      #}
       <div class="nav__item"><a class="nav__link" href="/contact-us/" {% if section == 'contact' %}aria-current="page"{% endif %}>Contact</a></div>
     </nav>
     <div class="header__actions">
@@ -149,14 +145,10 @@
         <summary>Industries {{ icon('down') }}</summary>
         <div>{% for m in site.industries_nav %}<a href="{{ m.path }}">{{ m.label }}</a>{% endfor %}</div>
       </details>
-      {# Hidden for now; may be used later.
       <details>
         <summary>Company {{ icon('down') }}</summary>
         <div>{% for m in site.company_nav %}<a href="{{ m.path }}">{{ m.label }}</a>{% endfor %}</div>
       </details>
-      <a href="/service/">Service</a>
-      <a href="/blog/">Blog</a>
-      #}
       <a href="/contact-us/">Contact</a>
       <div class="drawer__cta">
         <button class="btn btn--primary" type="button" data-enquire="">Get a quote</button>
